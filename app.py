@@ -89,16 +89,67 @@ if st.button("Calcular Modelo Sólido"):
         area_total += 2 * (L * W + L * T + W * T)
         
     col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("**Fórmulas de Volumen Sólido (Estructura en Cruz):**")
-        st.latex(r"B_n = 2 \cdot 2^n")
-        st.latex(r"V_{\text{rama}} = L \cdot W \cdot T")
-        st.latex(r"V_T = \sum_{n=0}^{N} 2^{n+1} (L_n \cdot W \cdot T)")
-        st.latex(r"A_T = \sum_{n=0}^{N} 2^{n+1} \cdot 2(L_n W + L_n T + W T)")
+    # ==========================================
+# BORRA LO ANTERIOR DESDE LAS COLUMNAS Y PEGA ESTO EXACTAMENTE AQUÍ:
 
-    with col2:
-        st.metric(label="Número Total de Ramas", value=f"{total_ramas}")
-        st.metric(label="Volumen Total del Sólido", value=f"{volumen_total:.4f} u³")
-        st.metric(label="Área Superficial Total", value=f"{area_total:.4f} u²")
-        st.success("Cálculo completado. Parámetros listos para análisis de material de impresión.")
+tab1, tab2 = st.tabs(["⚙️ Cálculo del Modelo Gráfico", "♾️ Motor de Cálculo Masivo (Sin Límites)"])
+
+with tab1:
+    total_ramas = len(ramas)
+    volumen_total = sum(r.longitud * ancho_regla * espesor_regla for r in ramas)
+    area_total = sum(2 * (r.longitud * ancho_regla + r.longitud * espesor_regla + ancho_regla * espesor_regla) for r in ramas)
+    
+    col_f1, col_f2 = st.columns(2)
+    with col_f1:
+        st.markdown("**Ecuaciones del modelo acotado por bucle:**")
+        st.latex(r"V_T = \sum_{n=0}^{N} 2^{n+1} (L_n \cdot W \cdot T)")
+    with col_f2:
+        st.metric(label="Ramas Graficadas", value=f"{total_ramas}")
+        st.metric(label="Volumen del Sólido", value=f"{volumen_total:.4f} u³")
+        st.metric(label="Área Superficial", value=f"{area_total:.4f} u²")
+
+with tab2:
+    st.write("### Simulación de Datos de Manufactura a Gran Escala")
+    st.write("Escribe el nivel de iteración exacto que deseas evaluar para los cálculos de material sin restricción gráfica:")
+    
+    # Caja de entrada libre (puedes teclear 50, 100, 500...)
+    N_masivo = st.number_input("Ingresa el nivel de iteración deseado (N)", min_value=1, max_value=1000000, value=50, step=1)
+    
+    W = ancho_regla
+    T = espesor_regla
+    
+    # Cálculos puros directos usando álgebra de series (milisegundos)
+    total_ramas_masivo = 2 * (2**(N_masivo + 1) - 1)
+    
+    if abs(2 * r - 1.0) < 1e-9:
+        volumen_masivo = 2 * (L0 * W * T) * (N_masivo + 1)
+        area_masiva = 2 * 2 * (L0 * W + L0 * T + W * T) * (N_masivo + 1)
+    else:
+        volumen_masivo = 2 * (L0 * W * T) * ((1 - (2 * r)**(N_masivo + 1)) / (1 - 2 * r))
+        
+        suma_areas = 0.0
+        for n in range(N_masivo + 1):
+            Ln = L0 * (r**n)
+            cantidad_ramas_nivel = 2 * (2**n)
+            suma_areas += cantidad_ramas_nivel * 2 * (Ln * W + Ln * T + W * T)
+        area_masiva = suma_areas
+
+    col_m1, col_m2 = st.columns(2)
+    with col_m1:
+        st.markdown("**Fórmulas Analíticas de Crecimiento Geométrico:**")
+        st.latex(r"B_{\text{total}} = 2 \cdot (2^{N+1} - 1)")
+        st.latex(r"V_N = 2 \cdot L_0 W T \left( \frac{1 - (2r)^{N+1}}{1 - 2r} \right)")
+        
+        if r < 0.5:
+            vol_infinito = 2 * (L0 * W * T) / (1 - 2 * r)
+            st.markdown("**Límite Teórico Verdadero si $N \\to \\infty$:**")
+            st.latex(r"V_{\infty} = \frac{2 L_0 W T}{1 - 2r}")
+            st.info(f"Volumen máximo absoluto en el infinito: **{vol_infinito:.4f} u³**")
+        else:
+            st.warning("⚠️ **Aviso:** Con r ≥ 0.5 el volumen diverge en el infinito físico.")
+
+    with col_m2:
+        st.subheader("💡 Resultados de Escala Calculada")
+        st.metric(label=f"Ramas Totales en N={N_masivo}", value=f"{total_ramas_masivo:,}")
+        st.metric(label=f"Volumen de Material Requerido", value=f"{volumen_masivo:.4f} u³")
+        st.metric(label=f"Área Superficial Estimada", value=f"{area_masiva:.4f} u²")
