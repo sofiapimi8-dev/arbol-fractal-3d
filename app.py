@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 from fractal import generar_arbol
-from matematicas import calcular_metricas_solido
 
 st.set_page_config(page_title="Visualizador de Árbol Fractal 3D", layout="wide")
 
@@ -32,9 +31,9 @@ ramas = generar_arbol(
     r=r
 )
 
-# Renderizado de la gráfica interactiva directamente aquí para evitar ImportErrors
+# Renderizado de la gráfica interactiva
 fig = go.Figure()
-for rama in rames if 'rames' in locals() else ramas:
+for rama in ramas:
     fig.add_trace(go.Scatter3d(
         x=[rama.inicio[0], rama.fin[0]],
         y=[rama.inicio[1], rama.fin[1]],
@@ -60,8 +59,19 @@ st.plotly_chart(fig, use_container_width=True)
 st.header("📊 Métricas de Ingeniería y Manufactura")
 
 if st.button("Calcular Modelo Sólido"):
-    volumen_total, area_total, total_ramas = calcular_metricas_solido(ramas, ancho_regla, espesor_regla)
+    # Cálculo directo dentro de la app para evitar ImportErrors
+    total_ramas = len(ramas)
+    volumen_total = 0.0
+    area_total = 0.0
     
+    for rama in ramas:
+        L = rama.longitud
+        W = ancho_regla
+        T = espesor_regla
+        
+        volumen_total += (L * W * T)
+        area_total += 2 * (L * W + L * T + W * T)
+        
     col1, col2 = st.columns(2)
     
     with col1:
