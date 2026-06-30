@@ -112,7 +112,7 @@ with tab2:
     st.write("Escribe el nivel de iteración exacto que deseas evaluar:")
     
     # Caja de entrada libre (puedes teclear 50, 100, 500...)
-    N_masivo = st.number_input("Ingresa el nivel de iteración (N)", min_value=1, max_value=1000000, value=50, step=1)
+    N_masivo = st.number_input("Ingresa el nivel de iteración (n)", min_value=1, max_value=1000000, value=50, step=1)
     
     W = ancho_regla
     T = espesor_regla
@@ -149,6 +149,6 @@ with tab2:
 
     with col_m2:
         st.subheader("Resultados")
-        st.metric(label=f"Ramas Totales en N={N_masivo}", value=f"{total_ramas_masivo:,}")
+        st.metric(label=f"Ramas Totales en n={N_masivo}", value=f"{total_ramas_masivo:,}")
         st.metric(label=f"Volumen", value=f"{volumen_masivo:.4f} u³")
         st.metric(label=f"Área Superficial Estimada", value=f"{area_masiva:.4f} u²")
