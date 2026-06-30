@@ -57,7 +57,7 @@ else:
     
     col1, col2 = st.columns([1, 2])
     
-with col1:
+    with col1:
         st.markdown("**Fórmulas de Volumen Sólido (Estructura en Cruz):**")
         st.latex(r"B_n = 2 \cdot 2^n")
         st.latex(r"V_{\text{rama}} = L \cdot W \cdot T")
