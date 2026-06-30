@@ -136,8 +136,8 @@ with tab2:
     col_m1, col_m2 = st.columns(2)
     with col_m1:
         st.markdown("**Fórmulas de crecimiento geométrico:**")
-        st.latex(r"B_{\text{total}} = 2 \cdot (2^{N+1} - 1)")
-        st.latex(r"V_N = 2 \cdot L_0 W T \left( \frac{1 - (2r)^{N+1}}{1 - 2r} \right)")
+        st.latex(r"B_{\text{total}} = 2 \cdot (2^{n+1} - 1)")
+        st.latex(r"V_n = 2 \cdot L_0 W T \left( \frac{1 - (2r)^{n+1}}{1 - 2r} \right)")
         
         if r < 0.5:
             vol_infinito = 2 * (L0 * W * T) / (1 - 2 * r)
