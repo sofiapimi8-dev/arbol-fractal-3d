@@ -45,15 +45,17 @@ COLORES_NIVEL = {
     9: '#FF4500',  # Rojo Anaranjado
     10: '#FF00FF'  # Magenta (Puntas finales)
 }
-# Renderizado de la gráfica interactiva
+# Renderizado de la gráfica interactiva con colores por nivel y sin leyendas repetidas
 fig = go.Figure()
 for rama in ramas:
+    color_rama = COLORES_NIVEL.get(rama.nivel, '#3CB371') # Asegura obtener el color del diccionario
     fig.add_trace(go.Scatter3d(
         x=[rama.inicio[0], rama.fin[0]],
         y=[rama.inicio[1], rama.fin[1]],
         z=[rama.inicio[2], rama.fin[2]],
         mode='lines',
-        line=dict(color='#4a3728', width=max(1, 7 - rama.nivel))
+        line=dict(color=color_rama, width=max(2, 8 - rama.nivel * 1.2)),
+        showlegend=False # ¡Esto borra los "trace 0, trace 1..." de la pantalla!
     ))
 
 fig.update_layout(
