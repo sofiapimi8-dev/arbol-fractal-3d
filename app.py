@@ -10,7 +10,7 @@ st.write("Estructura basada en la intersección de dos planos fractales puros a 
 
 # Barra lateral para los controles
 st.sidebar.header("Parámetros del Fractal")
-N = st.sidebar.slider("Niveles de recursión (N)", min_value=1, max_value=6, value=4)
+N = st.sidebar.slider("Niveles de recursión (N)", min_value=1, max_value=10, value=4)
 r = st.sidebar.slider("Factor de reducción de longitud (r)", min_value=0.4, max_value=0.8, value=0.65, step=0.05)
 L0 = st.sidebar.slider("Longitud del tronco inicial (L0)", min_value=1.0, max_value=10.0, value=5.0, step=0.5)
 
@@ -31,6 +31,20 @@ ramas = generar_arbol(
     r=r
 )
 
+# Paleta de colores llamativos por nivel (Tronco marrón -> Ramas degradadas hasta cian/fosforescente)
+COLORES_NIVEL = {
+    0: '#5C4033',  # Marrón Oscuro (Tronco)
+    1: '#CD7F32',  # Bronce / Madera clara
+    2: '#2E8B57',  # Verde Mar
+    3: '#3CB371',  # Verde Esmeralda
+    4: '#20B2AA',  # Verde Azulado Claro
+    5: '#00FFFF',  # Cian brillante
+    6: '#ADFF2F',  # Verde Lima
+    7: '#FFD700',  # Dorado
+    8: '#FF8C00',  # Naranja Oscuro
+    9: '#FF4500',  # Rojo Anaranjado
+    10: '#FF00FF'  # Magenta (Puntas finales)
+}
 # Renderizado de la gráfica interactiva
 fig = go.Figure()
 for rama in ramas:
