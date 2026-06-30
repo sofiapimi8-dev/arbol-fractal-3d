@@ -12,10 +12,7 @@ class Rama:
     direccion: np.ndarray
 
 def obtener_ejes_locales(direccion: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Calcula los vectores ortogonales locales (u, v) para una dirección dada.
-    'u' representa el ancho de la regla y 'v' el espesor de la regla.
-    """
+    """Calcula los vectores ortogonales locales para orientar la regla plana."""
     if abs(direccion[2]) > 0.999:
         u = np.array([1.0, 0.0, 0.0])
     else:
@@ -28,45 +25,57 @@ def obtener_ejes_locales(direccion: np.ndarray) -> tuple[np.ndarray, np.ndarray]
     
     return u, v
 
-def generar_arbol(inicio: np.ndarray, 
-                  direccion: np.ndarray, 
-                  longitud: float, 
-                  nivel_actual: int, 
-                  nivel_max: int, 
-                  r: float, 
-                  lista_ramas: List[Rama] = None) -> List[Rama]:
-    """Algoritmo recursivo para generar la estructura del árbol."""
-    if lista_ramas is None:
-        lista_ramas = []
-
+def generar_ramas_plano(inicio: np.ndarray, 
+                        direccion: np.ndarray, 
+                        vector_abertura: np.ndarray,
+                        longitud: float, 
+                        nivel_actual: int, 
+                        nivel_max: int, 
+                        r: float, 
+                        lista_ramas: List[Rama]) -> None:
+    """Genera un árbol fractal puramente plano (bifurcación de 2 ramas)."""
     fin = inicio + direccion * longitud
     rama_actual = Rama(inicio=inicio, fin=fin, nivel=nivel_actual, longitud=longitud, direccion=direccion)
     lista_ramas.append(rama_actual)
 
     if nivel_actual == nivel_max:
-        return lista_ramas
+        return
 
-    u, v = obtener_ejes_locales(direccion)
     theta = np.radians(35)
     cos_t = np.cos(theta)
     sin_t = np.sin(theta)
 
-    # Direcciones hijas en los planos locales XZ e YZ
-    dir_1 = cos_t * direccion + sin_t * u
-    dir_2 = cos_t * direccion - sin_t * u
-    dir_3 = cos_t * direccion + sin_t * v
-    dir_4 = cos_t * direccion - sin_t * v
+    # Cada rama se abre en SOLO DOS direcciones dentro de su plano asignado
+    dir_1 = cos_t * direccion + sin_t * vector_abertura
+    dir_2 = cos_t * direccion - sin_t * vector_abertura
 
     direcciones_hijas = [
         dir_1 / np.linalg.norm(dir_1),
-        dir_2 / np.linalg.norm(dir_2),
-        dir_3 / np.linalg.norm(dir_3),
-        dir_4 / np.linalg.norm(dir_4)
+        dir_2 / np.linalg.norm(dir_2)
     ]
 
     nueva_longitud = longitud * r
 
     for dir_hija in direcciones_hijas:
-        generar_arbol(fin, dir_hija, nueva_longitud, nivel_actual + 1, nivel_max, r, lista_ramas)
+        generar_ramas_plano(fin, dir_hija, vector_abertura, nueva_longitud, nivel_actual + 1, nivel_max, r, lista_ramas)
+
+def generar_arbol(inicio: np.ndarray, 
+                  direccion: np.ndarray, 
+                  longitud: float, 
+                  nivel_actual: int, 
+                  nivel_max: int, 
+                  r: float) -> List[Rama]:
+    """Construye la intersección de dos árboles planos independientes a 90 grados."""
+    lista_ramas = []
+    
+    # Definimos los vectores de apertura para cada plano
+    eje_x = np.array([1.0, 0.0, 0.0]) # Plano Frontal
+    eje_y = np.array([0.0, 1.0, 0.0]) # Plano Lateral (Rotado 90°)
+
+    # Árbol 1: Bifurcaciones en el plano X (Frontal)
+    generar_ramas_plano(inicio, direccion, eje_x, longitud, nivel_actual, nivel_max, r, lista_ramas)
+    
+    # Árbol 2: Bifurcaciones en el plano Y (Lateral)
+    generar_ramas_plano(inicio, direccion, eje_y, longitud, nivel_actual, nivel_max, r, lista_ramas)
 
     return lista_ramas
