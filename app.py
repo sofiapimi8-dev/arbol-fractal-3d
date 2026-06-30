@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
+import plotly.graph_objects as go
 from fractal import generar_arbol
-from visualizacion import crear_grafico_3d
 from matematicas import calcular_metricas_solido
 
 st.set_page_config(page_title="Visualizador de Árbol Fractal 3D", layout="wide")
@@ -32,8 +32,28 @@ ramas = generar_arbol(
     r=r
 )
 
-# Renderizado de la gráfica interactiva
-fig = crear_grafico_3d(ramas)
+# Renderizado de la gráfica interactiva directamente aquí para evitar ImportErrors
+fig = go.Figure()
+for rama in rames if 'rames' in locals() else ramas:
+    fig.add_trace(go.Scatter3d(
+        x=[rama.inicio[0], rama.fin[0]],
+        y=[rama.inicio[1], rama.fin[1]],
+        z=[rama.inicio[2], rama.fin[2]],
+        mode='lines',
+        line=dict(color='#4a3728', width=max(1, 7 - rama.nivel))
+    ))
+
+fig.update_layout(
+    scene=dict(
+        xaxis=dict(visible=False),
+        yaxis=dict(visible=False),
+        zaxis=dict(visible=False),
+        aspectmode='data'
+    ),
+    margin=dict(l=0, r=0, b=0, t=0),
+    height=600
+)
+
 st.plotly_chart(fig, use_container_width=True)
 
 # Sección de métricas de ingeniería
