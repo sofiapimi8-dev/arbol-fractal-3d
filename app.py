@@ -57,18 +57,12 @@ else:
     
     col1, col2 = st.columns([1, 2])
     
-    with col1:
-        st.markdown("**Fórmulas de Volumen Sólido:**")
-        st.latex(r"B_n = 4^n")
+with col1:
+        st.markdown("**Fórmulas de Volumen Sólido (Estructura en Cruz):**")
+        st.latex(r"B_n = 2 \cdot 2^n")
         st.latex(r"V_{\text{rama}} = L \cdot W \cdot T")
-        st.latex(r"V_T = \sum_{n=0}^{N} 4^n (L_n \cdot W \cdot T)")
-        st.latex(r"A_T = \sum_{n=0}^{N} 4^n \cdot 2(L_n W + L_n T + W T)")
-        
-        vol_total = st.session_state.resultados["Volumen_Total_Nivel"].sum()
-        area_total = st.session_state.resultados["Área_Total_Nivel"].sum()
-        
-        st.metric("Volumen de Material Total", f"{vol_total:.2f} u³")
-        st.metric("Área Superficial Total", f"{area_total:.2f} u²")
+        st.latex(r"V_T = \sum_{n=0}^{N} 2^{n+1} (L_n \cdot W \cdot T)")
+        st.latex(r"A_T = \sum_{n=0}^{N} 2^{n+1} \cdot 2(L_n W + L_n T + W T)")
 
     with col2:
         st.markdown("**Sucesiones Calculadas desde los Objetos:**")
