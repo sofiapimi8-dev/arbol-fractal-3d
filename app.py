@@ -5,18 +5,18 @@ from fractal import generar_arbol
 
 st.set_page_config(page_title="Visualizador de Árbol Fractal 3D", layout="wide")
 
-st.title("🌲 Modelado de Árbol Fractal 3D en Cruz")
-st.write("Estructura basada en la intersección de dos planos fractales puros a 90°.")
+st.title("Gráfico de Árbol Fractal 3D")
+st.write("Estructura basada en la intersección de dos planos fractales puros a 90°(planos xz, yz)")
 
 # Barra lateral para los controles
-st.sidebar.header("Parámetros del Fractal")
+st.sidebar.header("Parámetros del fractal")
 N = st.sidebar.slider("Niveles de recursión (N)", min_value=1, max_value=10, value=4)
 r = st.sidebar.slider("Factor de reducción de longitud (r)", min_value=0.4, max_value=0.8, value=0.65, step=0.05)
 L0 = st.sidebar.slider("Longitud del tronco inicial (L0)", min_value=1.0, max_value=10.0, value=5.0, step=0.5)
 
-st.sidebar.header("Dimensiones Físicas de la Regla")
-ancho_regla = st.sidebar.slider("Ancho de la regla (W)", min_value=0.1, max_value=1.0, value=0.3, step=0.05)
-espesor_regla = st.sidebar.slider("Espesor de la regla (T)", min_value=0.02, max_value=0.20, value=0.05, step=0.01)
+st.sidebar.header("Dimensiones físicas del sólido")
+ancho_regla = st.sidebar.slider("Ancho del sólido (W)", min_value=0.1, max_value=1.0, value=0.3, step=0.05)
+espesor_regla = st.sidebar.slider("Espesor del sólido (T)", min_value=0.02, max_value=0.20, value=0.05, step=0.01)
 
 # Generación de los datos geométricos del árbol
 inicio_tronco = np.array([0.0, 0.0, 0.0])
@@ -72,9 +72,9 @@ fig.update_layout(
 st.plotly_chart(fig, use_container_width=True)
 
 # Sección de métricas de ingeniería
-st.header("📊 Métricas de Ingeniería y Manufactura")
+st.header("Cálculos")
 
-if st.button("Calcular Modelo Sólido"):
+if st.button("Calcular modelo sólido"):
     # Cálculo directo dentro de la app para evitar ImportErrors
     total_ramas = len(ramas)
     volumen_total = 0.0
@@ -90,9 +90,8 @@ if st.button("Calcular Modelo Sólido"):
         
     col1, col2 = st.columns(2)
     # ==========================================
-# BORRA LO ANTERIOR DESDE LAS COLUMNAS Y PEGA ESTO EXACTAMENTE AQUÍ:
 
-tab1, tab2 = st.tabs(["⚙️ Cálculo del Modelo Gráfico", "♾️ Motor de Cálculo Masivo (Sin Límites)"])
+tab1, tab2 = st.tabs(["Cálculos del modelo sólido visualizado", "Cálculo modelo teórico (sin límites)"])
 
 with tab1:
     total_ramas = len(ramas)
@@ -101,19 +100,19 @@ with tab1:
     
     col_f1, col_f2 = st.columns(2)
     with col_f1:
-        st.markdown("**Ecuaciones del modelo acotado por bucle:**")
+        st.markdown("**Ecuaciones del modelo:**")
         st.latex(r"V_T = \sum_{n=0}^{N} 2^{n+1} (L_n \cdot W \cdot T)")
     with col_f2:
-        st.metric(label="Ramas Graficadas", value=f"{total_ramas}")
-        st.metric(label="Volumen del Sólido", value=f"{volumen_total:.4f} u³")
-        st.metric(label="Área Superficial", value=f"{area_total:.4f} u²")
+        st.metric(label="Ramas graficadas", value=f"{total_ramas}")
+        st.metric(label="Volumen del sólido", value=f"{volumen_total:.4f} u³")
+        st.metric(label="Área superficial", value=f"{area_total:.4f} u²")
 
 with tab2:
-    st.write("### Simulación de Datos de Manufactura a Gran Escala")
-    st.write("Escribe el nivel de iteración exacto que deseas evaluar para los cálculos de material sin restricción gráfica:")
+    st.write("### Simulación de datos a gran escala")
+    st.write("Escribe el nivel de iteración exacto que deseas evaluar:")
     
     # Caja de entrada libre (puedes teclear 50, 100, 500...)
-    N_masivo = st.number_input("Ingresa el nivel de iteración deseado (N)", min_value=1, max_value=1000000, value=50, step=1)
+    N_masivo = st.number_input("Ingresa el nivel de iteración (N)", min_value=1, max_value=1000000, value=50, step=1)
     
     W = ancho_regla
     T = espesor_regla
@@ -136,20 +135,20 @@ with tab2:
 
     col_m1, col_m2 = st.columns(2)
     with col_m1:
-        st.markdown("**Fórmulas Analíticas de Crecimiento Geométrico:**")
+        st.markdown("**Fórmulas de crecimiento geométrico:**")
         st.latex(r"B_{\text{total}} = 2 \cdot (2^{N+1} - 1)")
         st.latex(r"V_N = 2 \cdot L_0 W T \left( \frac{1 - (2r)^{N+1}}{1 - 2r} \right)")
         
         if r < 0.5:
             vol_infinito = 2 * (L0 * W * T) / (1 - 2 * r)
-            st.markdown("**Límite Teórico Verdadero si $N \\to \\infty$:**")
+            st.markdown("**Límite teórico verdadero si $N \\to \\infty$:**")
             st.latex(r"V_{\infty} = \frac{2 L_0 W T}{1 - 2r}")
             st.info(f"Volumen máximo absoluto en el infinito: **{vol_infinito:.4f} u³**")
         else:
-            st.warning("⚠️ **Aviso:** Con r ≥ 0.5 el volumen diverge en el infinito físico.")
+            st.warning("**Nota:** Con r ≥ 0.5 el volumen diverge en el infinito físico")
 
     with col_m2:
-        st.subheader("💡 Resultados de Escala Calculada")
+        st.subheader("Resultados")
         st.metric(label=f"Ramas Totales en N={N_masivo}", value=f"{total_ramas_masivo:,}")
-        st.metric(label=f"Volumen de Material Requerido", value=f"{volumen_masivo:.4f} u³")
+        st.metric(label=f"Volumen", value=f"{volumen_masivo:.4f} u³")
         st.metric(label=f"Área Superficial Estimada", value=f"{area_masiva:.4f} u²")
